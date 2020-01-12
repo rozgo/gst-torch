@@ -1,0 +1,6 @@
+/target
+**/*.rs.bk
+/scratch
+/dots
+/.vscode
+/.devcontainer
