@@ -20,11 +20,9 @@ extern crate rand;
 mod caps;
 mod zipper;
 mod cata;
-mod identity;
 mod monodepth;
 
 fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
-    cata::register::<identity::Identity>(plugin)?;
     cata::register::<monodepth::MonoDepth>(plugin)?;
     Ok(())
 }
