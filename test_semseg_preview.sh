@@ -9,6 +9,6 @@ gst-launch-1.0 \
     filesrc num-buffers=1000 location=assets/sample-04.mkv ! decodebin ! \
     aspectratiocrop aspect-ratio=10/3 ! videoscale ! videoconvert ! \
     video/x-raw,format=RGB,width=640,height=192 ! \
-    semseg ! videoconvert ! frei0r-filter-k-means-clustering ! videoconvert ! xvimagesink sync=false
+    semseg ! videoconvert ! fpsdisplaysink sync=false
 
 # dot -Tpng dots/graph.dot > graph.png

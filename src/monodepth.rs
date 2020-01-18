@@ -136,12 +136,15 @@ impl cata::Process for MonoDepth {
             let img_slice = unsafe {
                 std::slice::from_raw_parts(in_mat.data().unwrap(), (WIDTH * HEIGHT * 3) as usize)
             };
-            let img = tch::Tensor::of_slice(img_slice)
-                .to_kind(tch::Kind::Uint8)
-                .reshape(&[HEIGHT as i64, WIDTH as i64, 3])
-                .permute(&[2, 0, 1])
-                .to_device(tch::Device::Cuda(0));
-            let img = img.to_kind(tch::Kind::Float) / 255;
+            let img = Tensor::of_data_size(
+                img_slice,
+                &[HEIGHT as i64, WIDTH as i64, 3],
+                tch::Kind::Uint8,
+            )
+            .to_device(tch::Device::Cuda(0))
+            .permute(&[2, 0, 1])
+            .to_kind(tch::Kind::Float)
+                / 255;
             let i_img: tch::IValue = tch::IValue::Tensor(img.unsqueeze(0));
             let encoder_output = ENCODER_MODEL.lock().unwrap().forward_is(&[i_img]).unwrap();
             let enc_tensors = match &encoder_output {
@@ -201,14 +204,12 @@ impl cata::Process for MonoDepth {
                 .permute(&[2, 1, 0])
                 .to_device(tch::Device::Cpu);
 
-            let depth_color = Vec::<u8>::from(depth_color);
-            unsafe {
-                std::ptr::copy_nonoverlapping(
-                    depth_color.as_ptr(),
-                    out_data.as_mut_ptr(),
-                    (HEIGHT * WIDTH * 3) as usize,
-                );
-            }
+            let depth_out = unsafe {
+                std::slice::from_raw_parts_mut(out_data.as_mut_ptr(), (WIDTH * HEIGHT * 3) as usize)
+            };
+            depth_color
+                .to_kind(tch::Kind::Uint8)
+                .copy_data(depth_out, (WIDTH * HEIGHT * 3) as usize);
         }
 
         outbuf[0] = depth_buf;

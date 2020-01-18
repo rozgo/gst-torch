@@ -120,7 +120,7 @@ impl cata::Process for SemSeg {
             }
         }
 
-        let mut depth_buf = inbuf[0].copy_deep().unwrap();
+        let mut semseg_buf = inbuf[0].copy_deep().unwrap();
         {
             let rgb_ref = inbuf[0].as_ref();
             let in_frame =
@@ -140,9 +140,9 @@ impl cata::Process for SemSeg {
             )
             .unwrap();
 
-            let depth_ref = depth_buf.get_mut().unwrap();
+            let semseg_ref = semseg_buf.get_mut().unwrap();
             let mut out_frame =
-                gst_video::VideoFrameRef::from_buffer_ref_writable(depth_ref, &self.video_info)
+                gst_video::VideoFrameRef::from_buffer_ref_writable(semseg_ref, &self.video_info)
                     .unwrap();
             let _out_stride = out_frame.plane_stride()[0] as usize;
             let _out_format = out_frame.format();
@@ -151,26 +151,27 @@ impl cata::Process for SemSeg {
             let img_slice = unsafe {
                 std::slice::from_raw_parts(in_mat.data().unwrap(), (WIDTH * HEIGHT * 3) as usize)
             };
-            let img = tch::Tensor::of_slice(img_slice)
-                .to_kind(tch::Kind::Uint8)
-                .reshape(&[HEIGHT as i64, WIDTH as i64, 3])
-                .permute(&[2, 0, 1])
-                .to_device(tch::Device::Cuda(0));
-            let img = img.to_kind(tch::Kind::Float) / 255;
+            let img = Tensor::of_data_size(
+                img_slice,
+                &[HEIGHT as i64, WIDTH as i64, 3],
+                tch::Kind::Uint8,
+            )
+            .to_device(tch::Device::Cuda(0))
+            .permute(&[2, 0, 1])
+            .to_kind(tch::Kind::Float)
+                / 255;
             let img: tch::IValue = tch::IValue::Tensor(img.unsqueeze(0));
 
             let semseg_pred = SEMSEG_MODEL.lock().unwrap().forward_is(&[img]).unwrap();
             let semseg_pred = if let tch::IValue::Tensor(semseg_pred) = &semseg_pred {
-                    Some(semseg_pred)
-                } else { None };
-            // println!("color_map: {:?}", self.color_map);
-            // println!("semseg_pred: {:?}", semseg_pred);
-            let semseg_pred = semseg_pred.unwrap().squeeze(); 
+                Some(semseg_pred)
+            } else {
+                None
+            };
+            let semseg_pred = semseg_pred.unwrap().squeeze();
             let semseg_pred = semseg_pred.argmax(0, false).to_kind(tch::Kind::Uint8);
 
-            let color_index = semseg_pred
-                .flatten(0, 1)
-                .to_kind(tch::Kind::Int64);
+            let color_index = semseg_pred.flatten(0, 1).to_kind(tch::Kind::Int64);
 
             let semseg_color = self
                 .color_map
@@ -178,17 +179,15 @@ impl cata::Process for SemSeg {
                 .permute(&[2, 1, 0])
                 .to_device(tch::Device::Cpu);
 
-            let semseg_color = Vec::<u8>::from(semseg_color);
-            unsafe {
-                std::ptr::copy_nonoverlapping(
-                    semseg_color.as_ptr(),
-                    out_data.as_mut_ptr(),
-                    (HEIGHT * WIDTH * 3) as usize,
-                );
-            }
+            let semseg_out = unsafe {
+                std::slice::from_raw_parts_mut(out_data.as_mut_ptr(), (WIDTH * HEIGHT * 3) as usize)
+            };
+            semseg_color
+                .to_kind(tch::Kind::Uint8)
+                .copy_data(semseg_out, (WIDTH * HEIGHT * 3) as usize);
         }
 
-        outbuf[0] = depth_buf;
+        outbuf[0] = semseg_buf;
 
         Ok(())
     }
