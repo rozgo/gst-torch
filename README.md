@@ -7,8 +7,9 @@
 
 Not only are the networks CUDA-enabled, but the pipeline has also been accelerated with CUDA tensors.
 
-Source for [Monocular Depth](src/monodepth.rs)
-Source for [Monocular Depth](src/monodepth.rs)
+Source for:
+- [Monocular Depth](src/monodepth.rs)
+- [Semantic Segmentation](src/semseg.rs)
 
 
 Depends on CUDA-enabled LibTorch:
