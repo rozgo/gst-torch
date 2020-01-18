@@ -120,7 +120,7 @@ impl cata::Process for SemSeg {
             }
         }
 
-        let mut semseg_buf = inbuf[0].copy_deep().unwrap();
+        let mut semseg_buf = inbuf[0].copy();
         {
             let rgb_ref = inbuf[0].as_ref();
             let in_frame =
