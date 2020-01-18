@@ -4,7 +4,7 @@ export LD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
 export GST_PLUGIN_PATH=`pwd`/target/debug:${LIBTORCH}/lib
 export RUST_BACKTRACE=1
 
-# GST_DEBUG_DUMP_DOT_DIR=/home/rozgo/simbotic/gst-torch/dots/ \
+# GST_DEBUG_DUMP_DOT_DIR=dots/ \
 gst-launch-1.0 \
     filesrc num-buffers=1000 location=assets/sample-04.mkv ! decodebin ! \
     aspectratiocrop aspect-ratio=10/3 ! videoscale ! videoconvert ! \
