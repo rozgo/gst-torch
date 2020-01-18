@@ -6,7 +6,7 @@ export RUST_BACKTRACE=1
 
 # GST_DEBUG_DUMP_DOT_DIR=/home/rozgo/simbotic/gst-torch/dots/ \
 gst-launch-1.0 \
-    filesrc num-buffers=1000 location=assets/sample-01.webm ! decodebin ! \
+    filesrc num-buffers=1000 location=assets/sample-04.mkv ! decodebin ! \
     aspectratiocrop aspect-ratio=10/3 ! videoscale ! videoconvert ! \
     video/x-raw,format=RGB,width=640,height=192 ! \
     monodepth ! videoconvert ! xvimagesink sync=false

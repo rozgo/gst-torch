@@ -54,7 +54,7 @@ lazy_static! {
 
 pub struct MonoDepth {
     video_info: gst_video::VideoInfo,
-    magma_map: Tensor, // Tensor[[3, 1, 728], Uint8]
+    color_map: Tensor, // Tensor[[3, 1, 728], Uint8]
     depth_min: f32,
     depth_max: f32,
 }
@@ -70,7 +70,7 @@ impl std::default::Default for MonoDepth {
         let caps = gst::Caps::fixate(CAPS.lock().unwrap().clone());
         MonoDepth {
             video_info: gst_video::VideoInfo::from_caps(&caps).unwrap(),
-            magma_map: tch::vision::image::load("assets/magma.png")
+            color_map: tch::vision::image::load("assets/magma.png")
                 .unwrap()
                 .to_device(tch::Device::Cuda(0)),
             depth_min: 0f32,
@@ -189,22 +189,22 @@ impl cata::Process for MonoDepth {
             )
             .unwrap();
 
-            let magma_index = depth_output
+            let color_index = depth_output
                 .f_mul(&Tensor::from(727f32))
                 .unwrap()
                 .flatten(0, 3)
                 .to_kind(tch::Kind::Int64);
 
-            let depth_magma = self
-                .magma_map
-                .index_select(2, &magma_index)
+            let depth_color = self
+                .color_map
+                .index_select(2, &color_index)
                 .permute(&[2, 1, 0])
                 .to_device(tch::Device::Cpu);
 
-            let depth_magma = Vec::<u8>::from(depth_magma);
+            let depth_color = Vec::<u8>::from(depth_color);
             unsafe {
                 std::ptr::copy_nonoverlapping(
-                    depth_magma.as_ptr(),
+                    depth_color.as_ptr(),
                     out_data.as_mut_ptr(),
                     (HEIGHT * WIDTH * 3) as usize,
                 );
