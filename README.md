@@ -18,6 +18,14 @@ Depends on CUDA-enabled LibTorch:
 [PyTorch website download section](https://pytorch.org/get-started/locally/)
 - Set env `${LIBTORCH}`
 
+Depends on GStreamer development libraries:
+```
+apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+    gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav libgstrtspserver-1.0-dev
+```
+
 ### Test with any of the following:
 ```
 ./test_dashboard_file.sh
