@@ -4,9 +4,7 @@ use crate::registry;
 use failure::Fallible;
 use gst;
 use gst_video;
-use opencv::core;
 use std::i32;
-use std::mem::transmute;
 use std::sync::Mutex;
 use tch;
 use tch::Tensor;
@@ -113,17 +111,9 @@ impl cata::Process for MonoDepth {
                     .unwrap();
             let _in_stride = in_frame.plane_stride()[0] as usize;
             let _in_format = in_frame.format();
-            let in_width = in_frame.width() as i32;
-            let in_height = in_frame.height() as i32;
+            let _in_width = in_frame.width() as i32;
+            let _in_height = in_frame.height() as i32;
             let in_data = in_frame.plane_data(0).unwrap();
-            let in_mat = core::Mat::new_rows_cols_with_data(
-                in_height,
-                in_width,
-                core::CV_8UC3,
-                unsafe { transmute(in_data.as_ptr()) },
-                0,
-            )
-            .unwrap();
 
             let depth_ref = depth_buf.get_mut().unwrap();
             let mut out_frame =
@@ -134,7 +124,7 @@ impl cata::Process for MonoDepth {
             let out_data = out_frame.plane_data_mut(0).unwrap();
 
             let img_slice = unsafe {
-                std::slice::from_raw_parts(in_mat.data().unwrap(), (WIDTH * HEIGHT * 3) as usize)
+                std::slice::from_raw_parts(in_data.as_ptr(), (WIDTH * HEIGHT * 3) as usize)
             };
             let img = Tensor::of_data_size(
                 img_slice,
