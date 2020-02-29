@@ -7,7 +7,7 @@ export RUST_BACKTRACE=1
 gst-launch-1.0 --gst-disable-segtrap --gst-disable-registry-fork \
     videomixer name=comp sink_0::ypos=0 sink_1::ypos=192 sink_2::ypos=384 ! \
     xvimagesink sync=false \
-    filesrc location=assets/sample-04.mkv ! decodebin ! \
+    filesrc location=assets/sample-01.mkv ! decodebin ! \
     aspectratiocrop aspect-ratio=10/3 ! videoscale ! videoconvert ! \
     video/x-raw,format=RGB,width=640,height=192 ! \
     tee name=t ! \

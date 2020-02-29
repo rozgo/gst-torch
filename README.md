@@ -11,12 +11,11 @@ Source for:
 - [Monocular Depth](src/monodepth.rs)
 - [Semantic Segmentation](src/semseg.rs)
 
-
 Depends on CUDA-enabled LibTorch:
 
 - Get `libtorch` from the
 [PyTorch website download section](https://pytorch.org/get-started/locally/)
-- Set env `${LIBTORCH}`
+- Set env `$LIBTORCH`
 
 Depends on GStreamer development libraries:
 ```
@@ -24,6 +23,11 @@ apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
     gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
     gstreamer1.0-libav libgstrtspserver-1.0-dev
+```
+
+Other dependencies:
+```
+apt install libssl-dev
 ```
 
 ### Test with any of the following:
