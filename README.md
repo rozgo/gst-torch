@@ -30,6 +30,14 @@ Other dependencies:
 apt install libssl-dev
 ```
 
+Building:
+
+To build the rust models, just type:
+
+```
+./build.sh
+```
+
 ### Test with any of the following:
 ```
 ./test_dashboard_file.sh
