@@ -32,7 +32,7 @@ apt install libssl-dev
 
 Building:
 
-To build the rust models, just type:
+To build the rust gst plugin, just type:
 
 ```
 ./build.sh
