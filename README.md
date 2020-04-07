@@ -11,6 +11,8 @@ Source for:
 - [Monocular Depth](src/monodepth.rs)
 - [Semantic Segmentation](src/semseg.rs)
 
+## Dependencies
+
 Depends on CUDA-enabled LibTorch:
 
 - Get `libtorch` from the
@@ -30,7 +32,17 @@ Other dependencies:
 apt install libssl-dev
 ```
 
-Building:
+## Build
+
+### Environment variable:
+
+An environment variable needs to be set for all scripts and tools to be able to find this plugin.
+
+```
+export SIMBOTIC_GSTTORCH=/full/path/to/this/repo
+```
+
+### Building:
 
 To build the rust gst plugin, just type:
 
