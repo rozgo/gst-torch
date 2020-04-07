@@ -1,5 +1,5 @@
-# gst-torch
-### PyTorch plugins for GStreamer in Rust
+# Simbotic Torch
+### LibTorch plugin for GStreamer in Rust
 
 ![](assets/teaser-02.gif)
 
@@ -39,7 +39,7 @@ apt install libssl-dev
 An environment variable needs to be set for all scripts and tools to be able to find this plugin.
 
 ```
-export SIMBOTIC_GSTTORCH=/full/path/to/this/repo
+export SIMBOTIC_TORCH=/full/path/to/this/repo
 ```
 
 ### Building:

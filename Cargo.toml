@@ -1,5 +1,5 @@
 [package]
-name = "gst-torch"
+name = "simbotic-torch"
 version = "0.1.0"
 authors = ["Alex Rozgo <alex.rozgo@gmail.com>"]
 repository = "https://github.com/rozgo/gst-torch.git"
@@ -22,7 +22,7 @@ byteorder = "1.3.2"
 failure = "0.1"
 
 [lib]
-name = "gsttorch"
+name = "simbotictorch"
 crate-type = ["cdylib"]
 path = "src/lib.rs"
 

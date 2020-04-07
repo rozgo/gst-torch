@@ -69,7 +69,7 @@ lazy_static! {
         ],
     ));
     static ref SEMSEG_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_GSTTORCH").unwrap() + "/models/semseg/semseg.pt").unwrap());
+        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/semseg/semseg.pt").unwrap());
 }
 
 pub struct SemSeg {
