@@ -1,3 +1,4 @@
+use std::env;
 use crate::caps;
 use crate::cata;
 use crate::registry;
@@ -45,9 +46,9 @@ lazy_static! {
         ],
     ));
     static ref ENCODER_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load("models/monodepth/encoder.pt").unwrap());
+        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_GSTTORCH").unwrap() + "/models/monodepth/encoder.pt").unwrap());
     static ref DECODER_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load("models/monodepth/decoder.pt").unwrap());
+        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_GSTTORCH").unwrap() + "/models/monodepth/decoder.pt").unwrap());
 }
 
 pub struct MonoDepth {
@@ -68,7 +69,7 @@ impl std::default::Default for MonoDepth {
         let caps = gst::Caps::fixate(CAPS.lock().unwrap().clone());
         MonoDepth {
             video_info: gst_video::VideoInfo::from_caps(&caps).unwrap(),
-            color_map: tch::vision::image::load("assets/magma.png")
+            color_map: tch::vision::image::load(env::var("SIMBOTIC_GSTTORCH").unwrap() + "/assets/magma.png")
                 .unwrap()
                 .to_device(tch::Device::Cuda(0)),
             depth_min: 0f32,
