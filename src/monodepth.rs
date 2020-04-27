@@ -66,7 +66,8 @@ impl registry::Registry for MonoDepth {
 
 impl std::default::Default for MonoDepth {
     fn default() -> Self {
-        let caps = gst::Caps::fixate(CAPS.lock().unwrap().clone());
+        let mut caps: gst::Caps = CAPS.lock().unwrap().clone();
+        caps.fixate();
         MonoDepth {
             video_info: gst_video::VideoInfo::from_caps(&caps).unwrap(),
             color_map: tch::vision::image::load(env::var("SIMBOTIC_TORCH").unwrap() + "/assets/magma.png")

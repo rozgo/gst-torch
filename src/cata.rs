@@ -432,7 +432,8 @@ where
         let element = obj.downcast_ref::<gst::Element>().unwrap();
         for (pad, info) in self.src_pads.lock().unwrap().iter() {
             pad.set_active(true).unwrap();
-            let caps = gst::Caps::fixate(info.caps.clone());
+            let mut caps = info.caps.clone();
+            caps.fixate();
             pad.push_event(gst::Event::new_caps(&caps).build());
             // TODO: proper segment handling
             let segment = gst::FormattedSegment::<gst::ClockTime>::default();

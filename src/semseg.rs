@@ -85,7 +85,8 @@ impl registry::Registry for SemSeg {
 
 impl std::default::Default for SemSeg {
     fn default() -> Self {
-        let caps = gst::Caps::fixate(CAPS.lock().unwrap().clone());
+        let mut caps: gst::Caps = CAPS.lock().unwrap().clone();
+        caps.fixate();
         SemSeg {
             video_info: gst_video::VideoInfo::from_caps(&caps).unwrap(),
             color_map: label_map().to_device(tch::Device::Cuda(0)),
