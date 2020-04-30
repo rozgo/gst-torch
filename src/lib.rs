@@ -22,10 +22,12 @@ mod zipper;
 mod cata;
 mod monodepth;
 mod semseg;
+mod motiontransfer;
 
 fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
     cata::register::<monodepth::MonoDepth>(plugin)?;
     cata::register::<semseg::SemSeg>(plugin)?;
+    cata::register::<motiontransfer::MotionTransfer>(plugin)?;
     Ok(())
 }
 
