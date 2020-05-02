@@ -1,12 +1,16 @@
+use failure::Fallible;
 use std::env;
+use std::i32;
+use std::sync::Mutex;
+
 use crate::caps;
 use crate::cata;
 use crate::registry;
-use failure::Fallible;
+
+use glib::subclass;
 use gst;
 use gst_video;
-use std::i32;
-use std::sync::Mutex;
+
 use tch;
 use tch::Tensor;
 
@@ -45,10 +49,14 @@ lazy_static! {
             ),
         ],
     ));
-    static ref ENCODER_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/monodepth/encoder.pt").unwrap());
-    static ref DECODER_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/monodepth/decoder.pt").unwrap());
+    static ref ENCODER_MODEL: Mutex<tch::CModule> = Mutex::new(
+        tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/monodepth/encoder.pt")
+            .unwrap()
+    );
+    static ref DECODER_MODEL: Mutex<tch::CModule> = Mutex::new(
+        tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/monodepth/decoder.pt")
+            .unwrap()
+    );
 }
 
 pub struct MonoDepth {
@@ -62,6 +70,10 @@ impl registry::Registry for MonoDepth {
     const NAME: &'static str = "monodepth";
     const DEBUG_CATEGORY: &'static str = "monodepth";
     register_typedata!();
+
+    fn properties() -> &'static [glib::subclass::Property<'static>] {
+        &[]
+    }
 }
 
 impl std::default::Default for MonoDepth {
@@ -70,9 +82,11 @@ impl std::default::Default for MonoDepth {
         caps.fixate();
         MonoDepth {
             video_info: gst_video::VideoInfo::from_caps(&caps).unwrap(),
-            color_map: tch::vision::image::load(env::var("SIMBOTIC_TORCH").unwrap() + "/assets/magma.png")
-                .unwrap()
-                .to_device(tch::Device::Cuda(0)),
+            color_map: tch::vision::image::load(
+                env::var("SIMBOTIC_TORCH").unwrap() + "/assets/magma.png",
+            )
+            .unwrap()
+            .to_device(tch::Device::Cuda(0)),
             depth_min: 0f32,
             depth_max: 1f32,
         }
@@ -208,4 +222,6 @@ impl cata::Process for MonoDepth {
 
         Ok(())
     }
+
+    fn set_property(&mut self, _property: &subclass::Property, _value: &glib::Value) {}
 }

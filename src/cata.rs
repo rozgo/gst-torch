@@ -19,6 +19,8 @@ pub trait Process {
         inbuf: &Vec<gst::Buffer>,
         outbuf: &mut Vec<gst::Buffer>,
     ) -> Result<(), std::io::Error>;
+
+    fn set_property(&mut self, property: &subclass::Property, value: &glib::Value);
 }
 
 struct State<T>
@@ -316,6 +318,9 @@ where
             .unwrap();
             klass.add_pad_template(pad_template);
         }
+
+        // Install all our properties
+        klass.install_properties(T::properties());
     }
 
     fn new_with_class(klass: &subclass::simple::ClassStruct<Self>) -> Self {
@@ -442,6 +447,24 @@ where
         }
         for (pad, _info) in self.sink_pads.lock().unwrap().iter() {
             element.add_pad(pad).unwrap();
+        }
+    }
+
+    // Called whenever a value of a property is changed. It can be called
+    // at any time from any thread.
+    fn set_property(&self, _obj: &glib::Object, id: usize, value: &glib::Value) {
+        let prop = &T::properties()[id];
+        let mut state = self.state.lock().unwrap();
+        T::set_property(&mut state.processor, prop, value);
+    }
+
+    // Called whenever a value of a property is read. It can be called
+    // at any time from any thread.
+    fn get_property(&self, _obj: &glib::Object, id: usize) -> Result<glib::Value, ()> {
+        let prop = &T::properties()[id];
+
+        match *prop {
+            _ => unimplemented!(),
         }
     }
 }

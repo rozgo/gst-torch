@@ -1,7 +1,9 @@
 pub trait Registry {
     const NAME: &'static str;
     const DEBUG_CATEGORY: &'static str;
+
     fn type_data() -> ::std::ptr::NonNull<glib::subclass::TypeData>;
+    fn properties() -> &'static [glib::subclass::Property<'static>];
 }
 
 macro_rules! register_typedata {
@@ -17,4 +19,3 @@ macro_rules! register_typedata {
         }
     };
 }
-

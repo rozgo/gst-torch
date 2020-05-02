@@ -1,11 +1,15 @@
 use std::env;
+use std::i32;
+use std::sync::Mutex;
+
 use crate::caps;
 use crate::cata;
 use crate::registry;
+
+use glib::subclass;
 use gst;
 use gst_video;
-use std::i32;
-use std::sync::Mutex;
+
 use tch;
 use tch::Tensor;
 
@@ -35,17 +39,17 @@ fn label_map() -> Tensor {
     //  'bicycle'       , 18 , (119,  11,  32) ),
 
     let mut labels = vec![vec![30, 15, 60]; 19];
-    labels[ 0] = vec![128,  64, 128]; // road
-    labels[ 1] = vec![244,  35, 232]; // sidewalk
-    labels[ 2] = vec![ 70,  70,  70]; // building
-    labels[11] = vec![220,  20,  60]; // person
-    labels[12] = vec![255,   0,   0]; // rider
-    labels[13] = vec![  0,   0, 142]; // car
-    labels[14] = vec![  0,   0,  70]; // truck
-    labels[15] = vec![  0,  60, 100]; // bus
-    labels[16] = vec![  0,  80, 100]; // train
-    labels[17] = vec![  0,   0, 230]; // motorcycle
-    labels[18] = vec![119,  11,  32]; // bicycle
+    labels[0] = vec![128, 64, 128]; // road
+    labels[1] = vec![244, 35, 232]; // sidewalk
+    labels[2] = vec![70, 70, 70]; // building
+    labels[11] = vec![220, 20, 60]; // person
+    labels[12] = vec![255, 0, 0]; // rider
+    labels[13] = vec![0, 0, 142]; // car
+    labels[14] = vec![0, 0, 70]; // truck
+    labels[15] = vec![0, 60, 100]; // bus
+    labels[16] = vec![0, 80, 100]; // train
+    labels[17] = vec![0, 0, 230]; // motorcycle
+    labels[18] = vec![119, 11, 32]; // bicycle
     let labels = labels.into_iter().flatten().collect::<Vec<u8>>();
     Tensor::of_slice(&labels)
         .reshape(&[19, 1, 3])
@@ -68,8 +72,10 @@ lazy_static! {
             ),
         ],
     ));
-    static ref SEMSEG_MODEL: Mutex<tch::CModule> =
-        Mutex::new(tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/semseg/semseg.pt").unwrap());
+    static ref SEMSEG_MODEL: Mutex<tch::CModule> = Mutex::new(
+        tch::CModule::load(env::var("SIMBOTIC_TORCH").unwrap() + "/models/semseg/semseg.pt")
+            .unwrap()
+    );
 }
 
 pub struct SemSeg {
@@ -81,6 +87,10 @@ impl registry::Registry for SemSeg {
     const NAME: &'static str = "semseg";
     const DEBUG_CATEGORY: &'static str = "semseg";
     register_typedata!();
+
+    fn properties() -> &'static [glib::subclass::Property<'static>] {
+        &[]
+    }
 }
 
 impl std::default::Default for SemSeg {
@@ -183,4 +193,6 @@ impl cata::Process for SemSeg {
 
         Ok(())
     }
+
+    fn set_property(&mut self, _property: &subclass::Property, _value: &glib::Value) {}
 }
