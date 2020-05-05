@@ -284,11 +284,10 @@ impl cata::Process for MotionTransfer {
         match property {
             subclass::Property("source-image", ..) => {
                 let source_path: String = value.get().expect("source image path").unwrap();
-                self.source_image = Some(
-                    tch::vision::image::load(source_path)
-                        .unwrap()
-                        .to_device(tch::Device::Cuda(0)),
-                );
+                self.source_image = match tch::vision::image::load(source_path) {
+                    Ok(tensor) => Some(tensor.to_device(tch::Device::Cuda(0))),
+                    _ => None,
+                };
                 self.kp_source = None;
             }
             _ => unimplemented!(),
