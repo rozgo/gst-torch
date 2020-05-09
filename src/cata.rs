@@ -462,7 +462,6 @@ where
     // at any time from any thread.
     fn get_property(&self, _obj: &glib::Object, id: usize) -> Result<glib::Value, ()> {
         let prop = &T::properties()[id];
-
         match *prop {
             _ => unimplemented!(),
         }

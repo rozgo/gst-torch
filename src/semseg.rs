@@ -1,3 +1,4 @@
+use failure::Fallible;
 use std::env;
 use std::i32;
 use std::sync::Mutex;
@@ -16,40 +17,47 @@ use tch::Tensor;
 const WIDTH: i32 = 640;
 const HEIGHT: i32 = 192;
 
-fn label_map() -> Tensor {
-    //  label             id   color
-    //  'road'          ,  0 , (128,  64, 128) ),
-    //  'sidewalk'      ,  1 , (244,  35, 232) ),
-    //  'building'      ,  2 , ( 70,  70,  70) ),
-    //  'wall'          ,  3 , (102, 102, 156) ),
-    //  'fence'         ,  4 , (190, 153, 153) ),
-    //  'pole'          ,  5 , (153, 153, 153) ),
-    //  'traffic light' ,  6 , (250, 170,  30) ),
-    //  'traffic sign'  ,  7 , (220, 220,   0) ),
-    //  'vegetation'    ,  8 , (107, 142,  35) ),
-    //  'terrain'       ,  9 , (152, 251, 152) ),
-    //  'sky'           , 10 , ( 70, 130, 180) ),
-    //  'person'        , 11 , (220,  20,  60) ),
-    //  'rider'         , 12 , (255,   0,   0) ),
-    //  'car'           , 13 , (  0,   0, 142) ),
-    //  'truck'         , 14 , (  0,   0,  70) ),
-    //  'bus'           , 15 , (  0,  60, 100) ),
-    //  'train'         , 16 , (  0,  80, 100) ),
-    //  'motorcycle'    , 17 , (  0,   0, 230) ),
-    //  'bicycle'       , 18 , (119,  11,  32) ),
+lazy_static! {
+    static ref IMAGENET_MEAN: Mutex<Tensor> =
+        Mutex::new(Tensor::of_slice(&[0.485f32, 0.456, 0.406])
+        .to_device(tch::Device::Cuda(0))
+        .view((3, 1, 1)));
+    static ref IMAGENET_STD: Mutex<Tensor> =
+        Mutex::new(Tensor::of_slice(&[0.229f32, 0.224, 0.225])
+        .to_device(tch::Device::Cuda(0))
+        .view((3, 1, 1)));
+}
 
+pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
+    let mean = IMAGENET_MEAN.lock().unwrap();
+    let std = IMAGENET_STD.lock().unwrap();
+    (tensor.to_kind(tch::Kind::Float) / 255.0)
+        .f_sub(&mean)?
+        .f_div(&std)
+}
+
+fn label_map() -> Tensor {
     let mut labels = vec![vec![30, 15, 60]; 19];
-    labels[0] = vec![128, 64, 128]; // road
-    labels[1] = vec![244, 35, 232]; // sidewalk
-    labels[2] = vec![70, 70, 70]; // building
-    labels[11] = vec![220, 20, 60]; // person
-    labels[12] = vec![255, 0, 0]; // rider
-    labels[13] = vec![0, 0, 142]; // car
-    labels[14] = vec![0, 0, 70]; // truck
-    labels[15] = vec![0, 60, 100]; // bus
-    labels[16] = vec![0, 80, 100]; // train
-    labels[17] = vec![0, 0, 230]; // motorcycle
-    labels[18] = vec![119, 11, 32]; // bicycle
+    labels[ 0] = vec![128, 64,128];  // 'road'                
+    labels[ 1] = vec![244, 35,232];  // 'sidewalk'                  
+    labels[ 2] = vec![ 70, 70, 70];  // 'building'            
+    labels[ 3] = vec![102,102,156];  // 'wall'                
+    labels[ 4] = vec![190,153,153];  // 'fence'                            
+    labels[ 5] = vec![153,153,153];  // 'pole'                        
+    labels[ 6] = vec![250,170, 30];  // 'traffic light'       
+    labels[ 7] = vec![220,220,  0];  // 'traffic sign'        
+    labels[ 8] = vec![107,142, 35];  // 'vegetation'          
+    labels[ 9] = vec![152,251,152];  // 'terrain'             
+    labels[10] = vec![ 70,130,180];  // 'sky'                 
+    labels[11] = vec![220, 20, 60];  // 'person'              
+    labels[12] = vec![255,  0,  0];  // 'rider'               
+    labels[13] = vec![  0,  0,142];  // 'car'                 
+    labels[14] = vec![  0,  0, 70];  // 'truck'               
+    labels[15] = vec![  0, 60,100];  // 'bus'                            
+    labels[16] = vec![  0, 80,100];  // 'train'               
+    labels[17] = vec![  0,  0,230];  // 'motorcycle'          
+    labels[18] = vec![119, 11, 32];  // 'bicycle' 
+    
     let labels = labels.into_iter().flatten().collect::<Vec<u8>>();
     Tensor::of_slice(&labels)
         .reshape(&[19, 1, 3])
@@ -159,9 +167,8 @@ impl cata::Process for SemSeg {
                 tch::Kind::Uint8,
             )
             .to_device(tch::Device::Cuda(0))
-            .permute(&[2, 0, 1])
-            .to_kind(tch::Kind::Float)
-                / 255;
+            .permute(&[2, 0, 1]);
+            let img = normalize(&img).unwrap();
             let img: tch::IValue = tch::IValue::Tensor(img.unsqueeze(0));
 
             let semseg_pred = SEMSEG_MODEL.lock().unwrap().forward_is(&[img]).unwrap();

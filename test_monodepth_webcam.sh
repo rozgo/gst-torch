@@ -5,7 +5,7 @@ export GST_PLUGIN_PATH=${SIMBOTIC_TORCH}/target/debug:${LIBTORCH}/lib
 export RUST_BACKTRACE=1
 
 gst-launch-1.0 \
-    filesrc num-buffers=1000 location=assets/sample-04.mkv ! decodebin ! \
+    v4l2src ! \
     aspectratiocrop aspect-ratio=10/3 ! videoscale ! videoconvert ! \
     video/x-raw,format=RGB,width=640,height=192 ! \
-    monodepth ! videoconvert ! xvimagesink sync=true
+    monodepth ! videoconvert ! xvimagesink sync=false
