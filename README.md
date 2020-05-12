@@ -3,6 +3,8 @@
 
 ![](assets/teaser-02.gif)
 
+![](assets/motion_transfer.gif)
+
 ![](assets/monodepth_semseg_fusion.png)
 
 Not only are the networks CUDA-enabled, but the pipeline has also been accelerated with CUDA tensors.
@@ -50,13 +52,26 @@ To build the rust gst plugin, just type:
 ./build.sh
 ```
 
-### Test with any of the following:
+### Test Monodepth and Segmentation with any of the following:
 ```
 ./test_dashboard_file.sh
 ./test_dashboard_preview.sh
 ./test_monodepth_preview.sh
+./test_semseg_preview.sh
+./test_semseg_webcam.sh
 ```
 
+###  To Test Motion Transfer using an image:
+
+```
+./test_motiontransfer_preview.sh
+```
+
+### To test Motion Transfer using a webcam:
+
+```
+./test_motiontransfer_webcam.sh
+```
 
 ----------------------
 
@@ -95,7 +110,16 @@ year = {2019}
   year={2018}
 }
 ```
-
+```
+@InProceedings{Siarohin_2019_NeurIPS,
+  author={Siarohin, Aliaksandr and Lathuilière, Stéphane and Tulyakov, Sergey and Ricci, Elisa and Sebe, Nicu},
+  title={First Order Motion Model for Image Animation},
+  booktitle = {Conference on Neural Information Processing Systems (NeurIPS)},
+  month = {December},
+  year = {2019}
+}
+```
 - [tch-rs](https://github.com/LaurentMazare/tch-rs) - Rust bindings for PyTorch
 - [monodepth2](https://github.com/nianticlabs/monodepth2) - Monocular depth estimation from a single image
 - [semantic-segmentation](https://github.com/NVIDIA/semantic-segmentation) - Improving Semantic Segmentation via Video Propagation and Label Relaxation
+- [First Order Model for Image Animation](https://github.com/AliaksandrSiarohin/first-order-model) - The source code for the paper First Order Motion Model for Image Animation 
