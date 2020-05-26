@@ -127,8 +127,8 @@ impl cata::Process for MonoDepth {
                     .unwrap();
             let _in_stride = in_frame.plane_stride()[0] as usize;
             let _in_format = in_frame.format();
-            let _in_width = in_frame.width() as i32;
-            let _in_height = in_frame.height() as i32;
+            let in_width = in_frame.width() as i32;
+            let in_height = in_frame.height() as i32;
             let in_data = in_frame.plane_data(0).unwrap();
 
             let depth_ref = depth_buf.get_mut().unwrap();
@@ -140,11 +140,11 @@ impl cata::Process for MonoDepth {
             let out_data = out_frame.plane_data_mut(0).unwrap();
 
             let img_slice = unsafe {
-                std::slice::from_raw_parts(in_data.as_ptr(), (WIDTH * HEIGHT * 3) as usize)
+                std::slice::from_raw_parts(in_data.as_ptr(), in_data.len())
             };
             let img = Tensor::of_data_size(
                 img_slice,
-                &[HEIGHT as i64, WIDTH as i64, 3],
+                &[in_height as i64, in_width as i64, 3],
                 tch::Kind::Uint8,
             )
             .to_device(tch::Device::Cuda(0))

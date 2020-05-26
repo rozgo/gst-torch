@@ -43,6 +43,7 @@ where
 
 type PadMap = HashMap<gst::Pad, PadInfo>;
 
+#[derive(Debug)]
 struct PadInfo {
     name: &'static str,
     idx: usize,
@@ -205,10 +206,12 @@ where
             let sink_pads = self.sink_pads.lock().unwrap();
             let info = sink_pads.get(pad).unwrap();
             zipper.push(inbuf, info.idx);
+            gst_trace!(self.cat, obj: pad, "Pushed buffer to zipper {:?}", &info);
         };
 
         // Check if zipper can zip, process and push to srcs
         if let Some(buffers) = zipper.try_zip() {
+            gst_trace!(self.cat, obj: pad, "Check if zipper can zip, process and push to srcs {:?}", buffers);
             let num_sink_pads = self.sink_pads.lock().unwrap().len();
             let num_src_pads = self.src_pads.lock().unwrap().len();
 
@@ -408,7 +411,7 @@ where
         }
 
         // Setup buffer zipper
-        let zipper = Zipper::with_size(src_pads.len());
+        let zipper = Zipper::with_size(sink_pads.len());
 
         // Create new instance of Cata
         Self {

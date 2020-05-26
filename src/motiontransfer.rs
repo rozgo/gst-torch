@@ -96,7 +96,7 @@ impl caps::CapsDef for MotionTransfer {
             caps: CAPS.lock().unwrap().clone(),
         };
         let out_caps = caps::PadCaps {
-            name: "driven",
+            name: "transfer",
             caps: CAPS.lock().unwrap().clone(),
         };
         (vec![in_caps], vec![out_caps])

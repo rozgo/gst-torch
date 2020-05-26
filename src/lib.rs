@@ -23,11 +23,14 @@ mod cata;
 mod monodepth;
 mod semseg;
 mod motiontransfer;
+mod facepose;
+mod render;
 
 fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
     cata::register::<monodepth::MonoDepth>(plugin)?;
     cata::register::<semseg::SemSeg>(plugin)?;
     cata::register::<motiontransfer::MotionTransfer>(plugin)?;
+    cata::register::<facepose::FacePose>(plugin)?;
     Ok(())
 }
 

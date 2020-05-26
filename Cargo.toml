@@ -8,6 +8,7 @@ edition = "2018"
 description = "Torch GStreamer Plugin"
 
 [dependencies]
+clap = "2.33"
 rand = "0.7"
 glib = { git = "https://github.com/gtk-rs/glib", features = [] }
 gstreamer = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs", features = [] }
@@ -15,16 +16,25 @@ gstreamer-base = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs"
 gstreamer-video = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs" }
 gstreamer-audio = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs" }
 byte-slice-cast = "0.3"
-tch = "0.1.6"
+tch = "0.1.7"
 num-traits = "0.2"
 lazy_static = "1.4"
 byteorder = "1.3.2"
 failure = "0.1"
+wgpu = { path = "../wgpu-rs"}
+cgmath = "0.17.0"
+futures = "0.3"
+tri-mesh = "0.5.0"
 
 [lib]
 name = "simbotictorch"
 crate-type = ["cdylib"]
 path = "src/lib.rs"
 
+[[bin]]
+name = "simbotic-stream"
+path = "src/launch.rs"
+
 [build-dependencies]
 gst-plugin-version-helper = { path="./gst-plugin-version-helper" }
+

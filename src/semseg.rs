@@ -38,25 +38,25 @@ pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
 
 fn label_map() -> Tensor {
     let mut labels = vec![vec![30, 15, 60]; 19];
-    labels[ 0] = vec![128, 64,128];  // 'road'                
-    labels[ 1] = vec![244, 35,232];  // 'sidewalk'                  
-    labels[ 2] = vec![ 70, 70, 70];  // 'building'            
-    labels[ 3] = vec![102,102,156];  // 'wall'                
-    labels[ 4] = vec![190,153,153];  // 'fence'                            
-    labels[ 5] = vec![153,153,153];  // 'pole'                        
-    labels[ 6] = vec![250,170, 30];  // 'traffic light'       
-    labels[ 7] = vec![220,220,  0];  // 'traffic sign'        
-    labels[ 8] = vec![107,142, 35];  // 'vegetation'          
-    labels[ 9] = vec![152,251,152];  // 'terrain'             
-    labels[10] = vec![ 70,130,180];  // 'sky'                 
-    labels[11] = vec![220, 20, 60];  // 'person'              
-    labels[12] = vec![255,  0,  0];  // 'rider'               
-    labels[13] = vec![  0,  0,142];  // 'car'                 
-    labels[14] = vec![  0,  0, 70];  // 'truck'               
-    labels[15] = vec![  0, 60,100];  // 'bus'                            
-    labels[16] = vec![  0, 80,100];  // 'train'               
-    labels[17] = vec![  0,  0,230];  // 'motorcycle'          
-    labels[18] = vec![119, 11, 32];  // 'bicycle' 
+    labels[ 0] = vec![128,  64, 128];  // 'road'
+    labels[ 1] = vec![244,  35, 232];  // 'sidewalk'
+    labels[ 2] = vec![ 70,  70,  70];  // 'building'
+    labels[ 3] = vec![102, 102, 156];  // 'wall'
+    labels[ 4] = vec![190, 153, 153];  // 'fence'
+    labels[ 5] = vec![153, 153, 153];  // 'pole'
+    labels[ 6] = vec![250, 170,  30];  // 'traffic light'
+    labels[ 7] = vec![220, 220,   0];  // 'traffic sign'
+    labels[ 8] = vec![107, 142,  35];  // 'vegetation'
+    labels[ 9] = vec![152, 251, 152];  // 'terrain'
+    labels[10] = vec![ 70, 130, 180];  // 'sky'
+    labels[11] = vec![220,  20,  60];  // 'person'
+    labels[12] = vec![255,   0,   0];  // 'rider'
+    labels[13] = vec![  0,   0, 142];  // 'car'
+    labels[14] = vec![  0,   0,  70];  // 'truck'
+    labels[15] = vec![  0,  60, 100];  // 'bus'
+    labels[16] = vec![  0,  80, 100];  // 'train'
+    labels[17] = vec![  0,   0, 230];  // 'motorcycle'
+    labels[18] = vec![119,  11,  32];  // 'bicycle'
     
     let labels = labels.into_iter().flatten().collect::<Vec<u8>>();
     Tensor::of_slice(&labels)
@@ -119,7 +119,7 @@ impl caps::CapsDef for SemSeg {
             caps: CAPS.lock().unwrap().clone(),
         };
         let out_caps = caps::PadCaps {
-            name: "depth",
+            name: "semseg",
             caps: CAPS.lock().unwrap().clone(),
         };
         (vec![in_caps], vec![out_caps])
@@ -146,8 +146,8 @@ impl cata::Process for SemSeg {
                     .unwrap();
             let _in_stride = in_frame.plane_stride()[0] as usize;
             let _in_format = in_frame.format();
-            let _in_width = in_frame.width() as i32;
-            let _in_height = in_frame.height() as i32;
+            let in_width = in_frame.width() as i32;
+            let in_height = in_frame.height() as i32;
             let in_data = in_frame.plane_data(0).unwrap();
 
             let semseg_ref = semseg_buf.get_mut().unwrap();
@@ -159,11 +159,11 @@ impl cata::Process for SemSeg {
             let out_data = out_frame.plane_data_mut(0).unwrap();
 
             let img_slice = unsafe {
-                std::slice::from_raw_parts(in_data.as_ptr(), (WIDTH * HEIGHT * 3) as usize)
+                std::slice::from_raw_parts(in_data.as_ptr(), in_data.len())
             };
             let img = Tensor::of_data_size(
                 img_slice,
-                &[HEIGHT as i64, WIDTH as i64, 3],
+                &[in_height as i64, in_width as i64, 3],
                 tch::Kind::Uint8,
             )
             .to_device(tch::Device::Cuda(0))
