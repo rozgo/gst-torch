@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 export LD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
-export GST_PLUGIN_PATH=${SIMBOTIC_TORCH}/target/debug:${LIBTORCH}/lib
+export GST_PLUGIN_PATH=${SIMBOTIC_TORCH}/target/release:${LIBTORCH}/lib
 export RUST_BACKTRACE=1
 
-gst-launch-1.0 \
+./target/release/simbotic-stream \
     videomixer name=comp sink_0::xpos=0 sink_1::xpos=256 ! queue2 ! xvimagesink sync=false \
     v4l2src ! \
     aspectratiocrop aspect-ratio=1/1 ! videoscale ! videoconvert ! \

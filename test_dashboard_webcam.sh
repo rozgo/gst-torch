@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 export LD_LIBRARY_PATH=${LIBTORCH}/lib:$LD_LIBRARY_PATH
-export GST_PLUGIN_PATH=${SIMBOTIC_TORCH}/target/debug:${LIBTORCH}/lib
+export GST_PLUGIN_PATH=${SIMBOTIC_TORCH}/target/release:${LIBTORCH}/lib
 export RUST_BACKTRACE=1
 
-gst-launch-1.0 --gst-disable-segtrap --gst-disable-registry-fork \
+./target/release/simbotic-stream  \
     videomixer name=comp sink_0::ypos=0 sink_1::ypos=192 sink_2::ypos=384 ! \
     xvimagesink sync=false \
     v4l2src ! \
