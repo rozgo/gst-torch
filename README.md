@@ -7,7 +7,6 @@
 
 ![](assets/motion_transfer.gif)
 
-![](assets/rozgo.png)
 ![](assets/rozgo_3DDFA.jpg)
 ![](assets/rozgo_depth.png)
 ![](assets/rozgo_pose.jpg)
