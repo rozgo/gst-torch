@@ -13,6 +13,8 @@
 
 ![](assets/3DDFA.png)
 
+![](assets/salient.png)
+
 Not only are the networks CUDA-enabled, but the pipeline has also been accelerated with CUDA tensors.
 
 Source for:
@@ -149,9 +151,20 @@ year = {2019}
   publisher=  {IEEE}
 }
 ```
+```
+@InProceedings{Qin_2020_PR,
+title = {U2-Net: Going Deeper with Nested U-Structure for Salient Object Detection},
+author = {Qin, Xuebin and Zhang, Zichen and Huang, Chenyang and Dehghan, Masood and Zaiane, Osmar and Jagersand, Martin},
+journal = {Pattern Recognition},
+volume = {106},
+pages = {107404},
+year = {2020}
+}
+```
 
 - [tch-rs](https://github.com/LaurentMazare/tch-rs) - Rust bindings for PyTorch
 - [monodepth2](https://github.com/nianticlabs/monodepth2) - Monocular depth estimation from a single image
 - [semantic-segmentation](https://github.com/NVIDIA/semantic-segmentation) - Improving Semantic Segmentation via Video Propagation and Label Relaxation
 - [First Order Model for Image Animation](https://github.com/AliaksandrSiarohin/first-order-model) - First Order Motion Model for Image Animation
 - [3DDFA](https://github.com/cleardusk/3DDFA) - Face Alignment in Full Pose Range: A 3D Total Solution
+- [U^2-Net](https://github.com/NathanUA/U-2-Net) - Object detection based on a visual attention.
