@@ -24,12 +24,20 @@ Source for:
 
 ## Dependencies
 
-Depends on CUDA-enabled LibTorch:
+#### CUDA 10.1 + cuDNN
+Make sure you have CUDA 10.1 installed in your system with latest cuDNN.
+
+#### LibTorch 1.5.1
+Depends on CUDA(10.1)-enabled LibTorch:
 
 - Get `libtorch` from the
-[PyTorch website download section](https://pytorch.org/get-started/locally/)
+  - [PyTorch website download section](https://pytorch.org/get-started/locally/)
+  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip)
 - Set env `$LIBTORCH`
 
+![](assets/pytorch.png)
+
+#### GStreamer
 Depends on GStreamer development libraries:
 ```
 apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
@@ -38,12 +46,13 @@ apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     gstreamer1.0-libav libgstrtspserver-1.0-dev
 ```
 
+#### Misc dependencies
 SimboticTorch now includes a 3D rendering engine, and has the following dependencies:
 ```
 apt install glslang-tools
 ```
 
-Other dependencies:
+Others:
 ```
 apt install libssl-dev
 ```
