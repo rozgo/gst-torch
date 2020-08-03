@@ -24,8 +24,17 @@ Source for:
 
 ## Dependencies
 
+SimboticTorch has been tested on Ubuntu 18/20.
+
+#### Rust
+Works with latest stable [Rust](https://rustup.rs/)
+
 #### CUDA 10.1 + cuDNN
 Make sure you have CUDA 10.1 installed in your system with latest cuDNN.
+
+Download cuDNN v7.6.5 (November 5th, 2019), for CUDA 10.1:
+- cuDNN Runtime Library for Ubuntu18.04 (Deb)
+- cuDNN Developer Library for Ubuntu18.04 (Deb)
 
 #### LibTorch 1.5.1
 Depends on CUDA(10.1)-enabled LibTorch:
