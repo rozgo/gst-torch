@@ -64,6 +64,7 @@ apt install glslang-tools
 Others:
 ```
 apt install libssl-dev
+apt install gnome-video-effects-frei0r
 ```
 
 ## Build
