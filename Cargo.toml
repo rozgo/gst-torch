@@ -16,11 +16,10 @@ gstreamer-base = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs"
 gstreamer-video = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs" }
 gstreamer-audio = { git = "https://gitlab.freedesktop.org/gstreamer/gstreamer-rs" }
 byte-slice-cast = "0.3"
-tch = "0.1.7"
+tch = "0.2.0"
 num-traits = "0.2"
 lazy_static = "1.4"
 byteorder = "1.3.2"
-failure = "0.1"
 wgpu = {git = "https://github.com/gfx-rs/wgpu-rs.git", rev = "4cc94fe58e025c4f7e5ef84b461bc7d7636a6ec1"}
 cgmath = "0.17.0"
 futures = "0.3"

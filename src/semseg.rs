@@ -1,4 +1,3 @@
-use failure::Fallible;
 use std::env;
 use std::i32;
 use std::sync::Mutex;
@@ -12,23 +11,25 @@ use gst;
 use gst_video;
 
 use tch;
-use tch::Tensor;
+use tch::{TchError, Tensor};
 
 const WIDTH: i32 = 640;
 const HEIGHT: i32 = 192;
 
 lazy_static! {
-    static ref IMAGENET_MEAN: Mutex<Tensor> =
-        Mutex::new(Tensor::of_slice(&[0.485f32, 0.456, 0.406])
-        .to_device(tch::Device::Cuda(0))
-        .view((3, 1, 1)));
-    static ref IMAGENET_STD: Mutex<Tensor> =
-        Mutex::new(Tensor::of_slice(&[0.229f32, 0.224, 0.225])
-        .to_device(tch::Device::Cuda(0))
-        .view((3, 1, 1)));
+    static ref IMAGENET_MEAN: Mutex<Tensor> = Mutex::new(
+        Tensor::of_slice(&[0.485f32, 0.456, 0.406])
+            .to_device(tch::Device::Cuda(0))
+            .view((3, 1, 1))
+    );
+    static ref IMAGENET_STD: Mutex<Tensor> = Mutex::new(
+        Tensor::of_slice(&[0.229f32, 0.224, 0.225])
+            .to_device(tch::Device::Cuda(0))
+            .view((3, 1, 1))
+    );
 }
 
-pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
+pub fn normalize(tensor: &Tensor) -> Result<Tensor, TchError> {
     let mean = IMAGENET_MEAN.lock().unwrap();
     let std = IMAGENET_STD.lock().unwrap();
     (tensor.to_kind(tch::Kind::Float) / 255.0)
@@ -36,6 +37,7 @@ pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
         .f_div(&std)
 }
 
+#[rustfmt::skip]
 fn label_map() -> Tensor {
     let mut labels = vec![vec![30, 15, 60]; 19];
     labels[ 0] = vec![128,  64, 128];  // 'road'
@@ -158,9 +160,7 @@ impl cata::Process for SemSeg {
             let _out_format = out_frame.format();
             let out_data = out_frame.plane_data_mut(0).unwrap();
 
-            let img_slice = unsafe {
-                std::slice::from_raw_parts(in_data.as_ptr(), in_data.len())
-            };
+            let img_slice = unsafe { std::slice::from_raw_parts(in_data.as_ptr(), in_data.len()) };
             let img = Tensor::of_data_size(
                 img_slice,
                 &[in_height as i64, in_width as i64, 3],

@@ -36,12 +36,12 @@ Download cuDNN v7.6.5 (November 5th, 2019), for CUDA 10.1:
 - cuDNN Runtime Library for Ubuntu18.04 (Deb)
 - cuDNN Developer Library for Ubuntu18.04 (Deb)
 
-#### LibTorch 1.5.1
+#### LibTorch 1.6.0
 Depends on CUDA(10.1)-enabled LibTorch:
 
 - Get `libtorch` from the
   - [PyTorch website download section](https://pytorch.org/get-started/locally/)
-  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.5.1%2Bcu101.zip)
+  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.6.0%2Bcu101.zip)
 - Set env `$LIBTORCH`
 
 ![](assets/pytorch.png)

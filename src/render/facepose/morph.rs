@@ -127,7 +127,6 @@ pub fn update(_device: &wgpu::Device, time: gst::ClockTime, _model: &mut Model) 
 }
 
 pub fn view(device: &wgpu::Device, vertices: &Vec<f32>, model: &Model) -> wgpu::CommandEncoder {
-
     let vertices_bytes = vertices_as_bytes(&vertices);
     let vertex_usage = wgpu::BufferUsage::VERTEX;
     let vertex_buffer = device.create_buffer_with_data(vertices_bytes, vertex_usage);
@@ -185,7 +184,7 @@ pub fn view(device: &wgpu::Device, vertices: &Vec<f32>, model: &Model) -> wgpu::
         render_pass.set_pipeline(&model.graphics.render_pipeline);
         render_pass.set_vertex_buffer(0, vertex_buffer.slice(..));
         render_pass.set_index_buffer(model.graphics.index_buffer.slice(..));
-        let index_range = 0..(model.graphics.indices.len() ) as u32;
+        let index_range = 0..(model.graphics.indices.len()) as u32;
         let start_vertex = 0;
         let instance_range = 0..1;
         render_pass.draw_indexed(index_range, start_vertex, instance_range);

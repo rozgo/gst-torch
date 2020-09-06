@@ -1,4 +1,3 @@
-use failure::Fallible;
 use std::env;
 use std::i32;
 use std::sync::Mutex;
@@ -12,7 +11,7 @@ use gst;
 use gst_video;
 
 use tch;
-use tch::Tensor;
+use tch::{TchError, Tensor};
 
 use crate::render;
 
@@ -38,7 +37,7 @@ lazy_static! {
     );
 }
 
-pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
+pub fn normalize(tensor: &Tensor) -> Result<Tensor, TchError> {
     let mean = IMAGENET_MEAN.lock().unwrap();
     let std = IMAGENET_STD.lock().unwrap();
     tensor.to_kind(tch::Kind::Float).f_sub(&mean)?.f_div(&std)

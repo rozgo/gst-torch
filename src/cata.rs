@@ -212,7 +212,12 @@ where
 
         // Check if zipper can zip, process and push to srcs
         if let Some(buffers) = zipper.try_zip() {
-            gst_trace!(self.cat, obj: pad, "Check if zipper can zip, process and push to srcs {:?}", buffers);
+            gst_trace!(
+                self.cat,
+                obj: pad,
+                "Check if zipper can zip, process and push to srcs {:?}",
+                buffers
+            );
             let num_sink_pads = self.sink_pads.lock().unwrap().len();
             let num_src_pads = self.src_pads.lock().unwrap().len();
 
@@ -327,44 +332,42 @@ where
         klass.install_properties(T::properties());
     }
 
-    fn new_with_class(klass: &subclass::simple::ClassStruct<Self>) -> Self {
+    fn with_class(klass: &subclass::simple::ClassStruct<Self>) -> Self {
         let mut sink_pads: PadMap = PadMap::new();
         let mut src_pads: PadMap = PadMap::new();
 
         // Setup sink pads
         for (idx, caps) in T::caps_def().0.iter().enumerate() {
             let templ = klass.get_pad_template(caps.name).unwrap();
-            let pad = gst::Pad::new_from_template(&templ, Some(caps.name));
-
-            // Callback for handling downstream events
-            // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/eventfn.html?gi-language=c
-            pad.set_event_function(|pad, parent, event| {
-                Self::catch_panic_pad_function(
-                    parent,
-                    || false,
-                    |cata, element| cata.cata_event(pad, element, event),
-                )
-            });
-
-            // Callback for handling downstream queries
-            // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/queryfn.html?gi-language=c
-            pad.set_query_function(|pad, parent, query| {
-                Self::catch_panic_pad_function(
-                    parent,
-                    || false,
-                    |cata, element| cata.cata_query(pad, element, query),
-                )
-            });
-
-            // Callback for handling data processing
-            // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/chainfn.html?gi-language=c
-            pad.set_chain_function(|pad, parent, buffer| {
-                Self::catch_panic_pad_function(
-                    parent,
-                    || Err(gst::FlowError::Error),
-                    |cata, element| cata.sink_chain(pad, element, buffer),
-                )
-            });
+            let pad = gst::Pad::builder_with_template(&templ, Some(caps.name))
+                .chain_function(|pad, parent, buffer| {
+                    // Callback for handling data processing
+                    // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/chainfn.html?gi-language=c
+                    Self::catch_panic_pad_function(
+                        parent,
+                        || Err(gst::FlowError::Error),
+                        |cata, element| cata.sink_chain(pad, element, buffer),
+                    )
+                })
+                .event_function(|pad, parent, event| {
+                    // Callback for handling downstream events
+                    // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/eventfn.html?gi-language=c
+                    Self::catch_panic_pad_function(
+                        parent,
+                        || false,
+                        |cata, element| cata.cata_event(pad, element, event),
+                    )
+                })
+                .query_function(|pad, parent, query| {
+                    // Callback for handling downstream queries
+                    // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/queryfn.html?gi-language=c
+                    Self::catch_panic_pad_function(
+                        parent,
+                        || false,
+                        |cata, element| cata.cata_query(pad, element, query),
+                    )
+                })
+                .build();
 
             sink_pads.insert(
                 pad,
@@ -379,27 +382,26 @@ where
         // Setup source pads
         for (idx, caps) in T::caps_def().1.iter().enumerate() {
             let templ = klass.get_pad_template(caps.name).unwrap();
-            let pad = gst::Pad::new_from_template(&templ, Some(caps.name));
-
-            // Callback for handling upstream events
-            // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/eventfn.html?gi-language=c
-            pad.set_event_function(|pad, parent, event| {
-                Self::catch_panic_pad_function(
-                    parent,
-                    || false,
-                    |cata, element| cata.cata_event(pad, element, event),
-                )
-            });
-
-            // Callback for handling downstream queries
-            // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/queryfn.html?gi-language=c
-            pad.set_query_function(|pad, parent, query| {
-                Self::catch_panic_pad_function(
-                    parent,
-                    || false,
-                    |cata, element| cata.cata_query(pad, element, query),
-                )
-            });
+            let pad = gst::Pad::builder_with_template(&templ, Some(caps.name))
+                .event_function(|pad, parent, event| {
+                    // Callback for handling upstream events
+                    // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/eventfn.html?gi-language=c
+                    Self::catch_panic_pad_function(
+                        parent,
+                        || false,
+                        |cata, element| cata.cata_event(pad, element, event),
+                    )
+                })
+                .query_function(|pad, parent, query| {
+                    // Callback for handling downstream queries
+                    // https://gstreamer.freedesktop.org/documentation/plugin-development/basics/queryfn.html?gi-language=c
+                    Self::catch_panic_pad_function(
+                        parent,
+                        || false,
+                        |cata, element| cata.cata_query(pad, element, query),
+                    )
+                })
+                .build();
 
             src_pads.insert(
                 pad,
@@ -433,8 +435,6 @@ impl<T> ObjectImpl for Cata<T>
 where
     T: 'static + Send + Default + Process + CapsDef + Registry,
 {
-    glib_object_impl!();
-
     // Construct pads and add to element
     fn constructed(&self, obj: &glib::Object) {
         self.parent_constructed(obj);
@@ -443,10 +443,10 @@ where
             pad.set_active(true).unwrap();
             let mut caps = info.caps.clone();
             caps.fixate();
-            pad.push_event(gst::Event::new_caps(&caps).build());
+            pad.push_event(gst::event::Caps::new(&caps));
             // TODO: proper segment handling
             let segment = gst::FormattedSegment::<gst::ClockTime>::default();
-            pad.push_event(gst::Event::new_segment(&segment).build());
+            pad.push_event(gst::event::Segment::new(&segment));
             element.add_pad(pad).unwrap();
         }
         for (pad, _info) in self.sink_pads.lock().unwrap().iter() {
@@ -486,7 +486,7 @@ where
         match transition {
             gst::StateChange::NullToReady => {
                 self.prepare(element).map_err(|err| {
-                    element.post_error_message(&err);
+                    element.post_error_message(err);
                     gst::StateChangeError
                 })?;
             }
