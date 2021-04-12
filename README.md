@@ -1,4 +1,8 @@
 # Simbotic Torch
+
+Real-time computer vision pipeline for GStreamer; a PyTorch-powered GStreamer plugin developed with Rust. Includes custom 3D engine, accelerated ML models, accelerated capture and transform pipelines.
+
+
 ### LibTorch plugin for GStreamer in Rust
 
 ![](assets/monodepth_semseg_fusion.png)
