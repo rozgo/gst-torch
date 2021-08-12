@@ -1674,6 +1674,7 @@ dependencies = [
  "gstreamer-base",
  "gstreamer-video",
  "lazy_static",
+ "libc",
  "num-traits 0.2.12",
  "rand 0.7.3",
  "tch",

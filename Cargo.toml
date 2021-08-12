@@ -24,6 +24,7 @@ wgpu = {git = "https://github.com/gfx-rs/wgpu-rs.git", rev = "4cc94fe58e025c4f7e
 cgmath = "0.17.0"
 futures = "0.3"
 tri-mesh = "0.5.0"
+libc = "0.2.76"
 
 [lib]
 name = "simbotictorch"
