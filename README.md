@@ -33,22 +33,29 @@ SimboticTorch has been tested on Ubuntu 18/20.
 #### Rust
 Works with latest stable [Rust](https://rustup.rs/)
 
-#### CUDA 10.1 + cuDNN
-Make sure you have CUDA 10.1 installed in your system with latest cuDNN.
+#### CUDA 11.4 + cuDNN 8.2.2
+Make sure you have CUDA 11.4 installed in your system with cuDNN 8.2.2.
 
-Download cuDNN v7.6.5 (November 5th, 2019), for CUDA 10.1:
-- cuDNN Runtime Library for Ubuntu18.04 (Deb)
-- cuDNN Developer Library for Ubuntu18.04 (Deb)
+Download cuDNN v8.2.2 (July 6th, 2021), for CUDA 11.4:
+- cuDNN Runtime Library for Ubuntu20.04 (Deb)
+- cuDNN Developer Library for Ubuntu20.04 (Deb)
 
-#### LibTorch 1.6.0
-Depends on CUDA(10.1)-enabled LibTorch:
+NOTE: On Ubuntu 20, there might be an issue with missing libnvrtc-builtins.so.11.1. A symlink solves it:
+```
+vertex@vx-pc:/usr/local/cuda/targets/x86_64-linux/lib$ ll libnvrtc-builtins*
+lrwxrwxrwx 1 root root      25 Jul 15 12:10 libnvrtc-builtins.so -> libnvrtc-builtins.so.11.4
+lrwxrwxrwx 1 root root      25 Aug 12 00:01 libnvrtc-builtins.so.11.1 -> libnvrtc-builtins.so.11.4
+lrwxrwxrwx 1 root root      29 Jul 15 12:10 libnvrtc-builtins.so.11.4 -> libnvrtc-builtins.so.11.4.100
+-rw-r--r-- 1 root root 6883208 Jul 15 12:10 libnvrtc-builtins.so.11.4.100
+```
+
+#### LibTorch 1.9.0
+Depends on CUDA-enabled (works with CUDA 11.4) LibTorch:
 
 - Get `libtorch` from the
   - [PyTorch website download section](https://pytorch.org/get-started/locally/)
-  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu101/libtorch-cxx11-abi-shared-with-deps-1.6.0%2Bcu101.zip)
+  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu111/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcu111.zip)
 - Set env `$LIBTORCH`
-
-![](assets/pytorch.png)
 
 #### GStreamer
 Depends on GStreamer development libraries:
