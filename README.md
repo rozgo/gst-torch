@@ -47,14 +47,16 @@ lrwxrwxrwx 1 root root      25 Jul 15 12:10 libnvrtc-builtins.so -> libnvrtc-bui
 lrwxrwxrwx 1 root root      25 Aug 12 00:01 libnvrtc-builtins.so.11.1 -> libnvrtc-builtins.so.11.4
 lrwxrwxrwx 1 root root      29 Jul 15 12:10 libnvrtc-builtins.so.11.4 -> libnvrtc-builtins.so.11.4.100
 -rw-r--r-- 1 root root 6883208 Jul 15 12:10 libnvrtc-builtins.so.11.4.100
+
+sudo ln -s /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so.11.4 /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so.11.1
 ```
 
-#### LibTorch 1.9.0
+#### LibTorch 1.11.0
 Depends on CUDA-enabled (works with CUDA 11.4) LibTorch:
 
 - Get `libtorch` from the
   - [PyTorch website download section](https://pytorch.org/get-started/locally/)
-  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu111/libtorch-cxx11-abi-shared-with-deps-1.9.0%2Bcu111.zip)
+  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu113/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcu113.zip)
 - Set env `$LIBTORCH`
 
 #### GStreamer
