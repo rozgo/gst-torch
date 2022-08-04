@@ -128,61 +128,68 @@ pub fn update(_device: &wgpu::Device, time: gst::ClockTime, _model: &mut Model) 
 
 pub fn view(device: &wgpu::Device, vertices: &Vec<f32>, model: &Model) -> wgpu::CommandEncoder {
     let vertex_usage = wgpu::BufferUsage::VERTEX;
-    
+
     let mut vertex_buffers: Vec<(usize, wgpu::Buffer)> = Vec::new();
-    
-    { // jaw
+
+    {
+        // jaw
         let landmark: Vec<f32> = vertices[(3 * 0)..(3 * 17)].to_vec();
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // r brow
+
+    {
+        // r brow
         let landmark: Vec<f32> = vertices[(3 * 17)..(3 * 22)].to_vec();
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // l brow
+
+    {
+        // l brow
         let landmark: Vec<f32> = vertices[(3 * 22)..(3 * 27)].to_vec();
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // nose
+
+    {
+        // nose
         let landmark: Vec<f32> = vertices[(3 * 27)..(3 * 36)].to_vec();
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // r eye
+
+    {
+        // r eye
         let mut landmark: Vec<f32> = vertices[(3 * 36)..(3 * 42)].to_vec();
         landmark.extend(landmark[0..3].to_vec());
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // l eye
+
+    {
+        // l eye
         let mut landmark: Vec<f32> = vertices[(3 * 42)..(3 * 48)].to_vec();
         landmark.extend(landmark[0..3].to_vec());
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
-    { // mouth
+
+    {
+        // mouth
         let mut landmark: Vec<f32> = vertices[(3 * 48)..(3 * 68)].to_vec();
         landmark.extend(landmark[0..3].to_vec());
         let vertices_bytes = vertices_as_bytes(&landmark);
         let vb = device.create_buffer_with_data(vertices_bytes, vertex_usage);
         vertex_buffers.push((landmark.len() / 3, vb));
     }
-    
+
     let uniforms = create_uniforms(
         [
             model.graphics.texture_extent.width,

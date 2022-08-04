@@ -1,4 +1,3 @@
-use failure::Fallible;
 use std::env;
 use std::i32;
 use std::sync::Mutex;
@@ -12,7 +11,7 @@ use gst;
 use gst_video;
 
 use tch;
-use tch::Tensor;
+use tch::{TchError, Tensor};
 
 fn lerp<T: num_traits::float::Float>(a: T, b: T, alpha: T) -> T {
     a + alpha * (b - a)
@@ -24,7 +23,7 @@ fn tensor_map_range(
     in_b: &Tensor,
     out_a: &Tensor,
     out_b: &Tensor,
-) -> Fallible<Tensor> {
+) -> Result<Tensor, TchError> {
     let pos = val.f_sub(in_a)?.f_div(&in_b.f_sub(in_a)?)?;
     let mapped = out_a.f_add(&out_b.f_sub(out_a)?.f_mul(&pos)?)?;
     Ok(mapped.clamp(f64::from(out_a), f64::from(out_b)))
@@ -139,9 +138,7 @@ impl cata::Process for MonoDepth {
             let _out_format = out_frame.format();
             let out_data = out_frame.plane_data_mut(0).unwrap();
 
-            let img_slice = unsafe {
-                std::slice::from_raw_parts(in_data.as_ptr(), in_data.len())
-            };
+            let img_slice = unsafe { std::slice::from_raw_parts(in_data.as_ptr(), in_data.len()) };
             let img = Tensor::of_data_size(
                 img_slice,
                 &[in_height as i64, in_width as i64, 3],

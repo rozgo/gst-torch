@@ -1,4 +1,3 @@
-#[macro_use]
 extern crate glib;
 #[macro_use]
 extern crate gstreamer as gst;
@@ -18,16 +17,17 @@ mod registry;
 extern crate rand;
 
 mod caps;
-mod zipper;
 mod cata;
-mod monodepth;
-mod semseg;
-mod motiontransfer;
 mod facepose;
-mod salientobject;
+mod monodepth;
+mod motiontransfer;
 mod render;
+mod salientobject;
+mod semseg;
+mod zipper;
 
 fn plugin_init(plugin: &gst::Plugin) -> Result<(), glib::BoolError> {
+    python_init();
     cata::register::<monodepth::MonoDepth>(plugin)?;
     cata::register::<semseg::SemSeg>(plugin)?;
     cata::register::<motiontransfer::MotionTransfer>(plugin)?;
@@ -47,3 +47,18 @@ gst_plugin_define!(
     env!("CARGO_PKG_REPOSITORY"),
     env!("BUILD_REL_DATE")
 );
+
+fn python_init() {
+    extern "C" {
+        fn dlopen(filename: *const libc::c_char, flags: libc::c_int) -> *mut libc::c_void;
+    }
+
+    const RTLD_GLOBAL: libc::c_int = 0x00100;
+    const RTLD_LAZY: libc::c_int = 0x00001;
+
+    // make sure this path is null-terminated
+    const LIBPYTHON: &'static str = "/usr/lib/x86_64-linux-gnu/libpython3.8.so\0";
+    unsafe {
+        dlopen(LIBPYTHON.as_ptr() as *const i8, RTLD_GLOBAL | RTLD_LAZY);
+    }
+}

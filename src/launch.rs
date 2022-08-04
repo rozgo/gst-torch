@@ -12,7 +12,7 @@ fn launch_main(pipeline_str: String) {
 
     let mut context = gst::ParseContext::new();
     let pipeline =
-        match gst::parse_launch_full(&pipeline_str, Some(&mut context), gst::ParseFlags::NONE) {
+        match gst::parse_launch_full(&pipeline_str, Some(&mut context), gst::ParseFlags::empty()) {
             Ok(pipeline) => pipeline,
             Err(err) => {
                 if let Some(gst::ParseError::NoSuchElement) = err.kind::<gst::ParseError>() {
@@ -80,7 +80,6 @@ fn launch_main(pipeline_str: String) {
 }
 
 fn main() {
-
     let options = App::new("Simbotic")
         .setting(AppSettings::TrailingVarArg)
         .arg(Arg::with_name("pipeline").multiple(true))

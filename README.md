@@ -1,4 +1,8 @@
 # Simbotic Torch
+
+Real-time computer vision pipeline for GStreamer; a PyTorch-powered GStreamer plugin developed with Rust. Includes custom 3D engine, accelerated ML models, accelerated capture and transform pipelines.
+
+
 ### LibTorch plugin for GStreamer in Rust
 
 ![](assets/monodepth_semseg_fusion.png)
@@ -24,12 +28,38 @@ Source for:
 
 ## Dependencies
 
-Depends on CUDA-enabled LibTorch:
+SimboticTorch has been tested on Ubuntu 18/20.
+
+#### Rust
+Works with latest stable [Rust](https://rustup.rs/)
+
+#### CUDA 11.4 + cuDNN 8.2.2
+Make sure you have CUDA 11.4 installed in your system with cuDNN 8.2.2.
+
+Download cuDNN v8.2.2 (July 6th, 2021), for CUDA 11.4:
+- cuDNN Runtime Library for Ubuntu20.04 (Deb)
+- cuDNN Developer Library for Ubuntu20.04 (Deb)
+
+NOTE: On Ubuntu 20, there might be an issue with missing libnvrtc-builtins.so.11.1. A symlink solves it:
+```
+vertex@vx-pc:/usr/local/cuda/targets/x86_64-linux/lib$ ll libnvrtc-builtins*
+lrwxrwxrwx 1 root root      25 Jul 15 12:10 libnvrtc-builtins.so -> libnvrtc-builtins.so.11.4
+lrwxrwxrwx 1 root root      25 Aug 12 00:01 libnvrtc-builtins.so.11.1 -> libnvrtc-builtins.so.11.4
+lrwxrwxrwx 1 root root      29 Jul 15 12:10 libnvrtc-builtins.so.11.4 -> libnvrtc-builtins.so.11.4.100
+-rw-r--r-- 1 root root 6883208 Jul 15 12:10 libnvrtc-builtins.so.11.4.100
+
+sudo ln -s /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so.11.4 /usr/local/cuda/targets/x86_64-linux/lib/libnvrtc-builtins.so.11.1
+```
+
+#### LibTorch 1.11.0
+Depends on CUDA-enabled (works with CUDA 11.4) LibTorch:
 
 - Get `libtorch` from the
-[PyTorch website download section](https://pytorch.org/get-started/locally/)
+  - [PyTorch website download section](https://pytorch.org/get-started/locally/)
+  - Specifically [cxxx11 ABI](https://download.pytorch.org/libtorch/cu113/libtorch-cxx11-abi-shared-with-deps-1.11.0%2Bcu113.zip)
 - Set env `$LIBTORCH`
 
+#### GStreamer
 Depends on GStreamer development libraries:
 ```
 apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
@@ -38,14 +68,17 @@ apt install libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     gstreamer1.0-libav libgstrtspserver-1.0-dev
 ```
 
+#### Misc dependencies
 SimboticTorch now includes a 3D rendering engine, and has the following dependencies:
 ```
 apt install glslang-tools
 ```
 
-Other dependencies:
+Others:
 ```
 apt install libssl-dev
+apt install libx11-dev
+apt install gnome-video-effects-frei0r
 ```
 
 ## Build

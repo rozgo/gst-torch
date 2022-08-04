@@ -1,4 +1,3 @@
-use failure::Fallible;
 use std::env;
 use std::i32;
 use std::sync::Mutex;
@@ -12,20 +11,22 @@ use gst;
 use gst_video;
 
 use tch;
-use tch::Tensor;
+use tch::{TchError, Tensor};
 
 lazy_static! {
-    static ref IMAGENET_MEAN: Mutex<Tensor> =
-        Mutex::new(Tensor::of_slice(&[0.485f32, 0.456, 0.406])
-        .to_device(tch::Device::Cuda(0))
-        .view((3, 1, 1)));
-    static ref IMAGENET_STD: Mutex<Tensor> =
-        Mutex::new(Tensor::of_slice(&[0.229f32, 0.224, 0.225])
-        .to_device(tch::Device::Cuda(0))
-        .view((3, 1, 1)));
+    static ref IMAGENET_MEAN: Mutex<Tensor> = Mutex::new(
+        Tensor::of_slice(&[0.485f32, 0.456, 0.406])
+            .to_device(tch::Device::Cuda(0))
+            .view((3, 1, 1))
+    );
+    static ref IMAGENET_STD: Mutex<Tensor> = Mutex::new(
+        Tensor::of_slice(&[0.229f32, 0.224, 0.225])
+            .to_device(tch::Device::Cuda(0))
+            .view((3, 1, 1))
+    );
 }
 
-pub fn normalize(tensor: &Tensor) -> Fallible<Tensor> {
+pub fn normalize(tensor: &Tensor) -> Result<Tensor, TchError> {
     let mean = IMAGENET_MEAN.lock().unwrap();
     let std = IMAGENET_STD.lock().unwrap();
     (tensor.to_kind(tch::Kind::Float) / 255.0)
@@ -121,7 +122,6 @@ impl cata::Process for SalientObject {
         inbuf: &Vec<gst::Buffer>,
         outbufs: &mut Vec<gst::Buffer>,
     ) -> Result<(), std::io::Error> {
-
         let in_ref = inbuf[0].as_ref();
         let in_frame =
             gst_video::VideoFrameRef::from_buffer_ref_readable(in_ref, &self.video_info_in)
@@ -132,9 +132,7 @@ impl cata::Process for SalientObject {
         let in_height = in_frame.height() as i32;
         let in_data = in_frame.plane_data(0).unwrap();
 
-        let img_slice = unsafe {
-            std::slice::from_raw_parts(in_data.as_ptr(), in_data.len())
-        };
+        let img_slice = unsafe { std::slice::from_raw_parts(in_data.as_ptr(), in_data.len()) };
         let img = Tensor::of_data_size(
             img_slice,
             &[in_height as i64, in_width as i64, 3],
@@ -166,7 +164,7 @@ impl cata::Process for SalientObject {
             let min = tch::Tensor::min(&prediction);
             (&prediction - &min) / (&max - &min)
         };
-        let prediction = prediction  * Tensor::of_slice(&[255f32]).to_device(tch::Device::Cuda(0));
+        let prediction = prediction * Tensor::of_slice(&[255f32]).to_device(tch::Device::Cuda(0));
 
         outbufs[0] = gst::Buffer::with_size((WIDTH * HEIGHT) as usize).unwrap();
         let out_ref = outbufs[0].get_mut().unwrap();
@@ -174,11 +172,9 @@ impl cata::Process for SalientObject {
         out_ref.set_dts(in_ref.get_pts());
         out_ref.set_offset(in_ref.get_offset());
         out_ref.set_duration(in_ref.get_duration());
-        let mut out_frame = gst_video::VideoFrameRef::from_buffer_ref_writable(
-            out_ref,
-            &self.video_info_out,
-        )
-        .unwrap();
+        let mut out_frame =
+            gst_video::VideoFrameRef::from_buffer_ref_writable(out_ref, &self.video_info_out)
+                .unwrap();
         let out_data = out_frame.plane_data_mut(0).unwrap();
         let pred_out = unsafe {
             std::slice::from_raw_parts_mut(out_data.as_mut_ptr(), (WIDTH * HEIGHT) as usize)
